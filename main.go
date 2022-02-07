@@ -76,13 +76,13 @@ func CreateGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
 		hub.GamesMu.Lock()
 		defer hub.GamesMu.Unlock()
 
-		for hub.Games[slug] == nil {
+		for hub.Games[slug] != nil {
 			if counter > 10 {
 				http.Error(res, "failed to create game, please try again", http.StatusInternalServerError)
 				return
 			}
 
-			game.Slug = utils.RandomString(10)
+			slug = utils.RandomString(10)
 			counter++
 		}
 
