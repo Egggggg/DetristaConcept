@@ -150,7 +150,7 @@ func HookGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
 		}
 
 		game.AddPlayer(player)
-
-
+		
+		utils.WriteTimeout(req.Context(), time.Second*5, conn, []byte("connected"))
 	}
 }
