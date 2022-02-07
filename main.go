@@ -47,7 +47,7 @@ func main() {
 		Players: make(map[string]*Player),
 	}
 
-	router.HandleFunc("/create-game", CreateGame(&hub))
+	router.HandleFunc("/create", CreateGame(&hub))
 	router.HandleFunc("/play/{slug}", JoinGame(&hub))
 	router.HandleFunc("/api/games/{slug}", HookGame(&hub))
 	
