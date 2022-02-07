@@ -93,6 +93,9 @@ func CreateGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
 		}
 
 		hub.Games[slug] = game
+
+		res.WriteHeader(http.StatusAccepted)
+		res.Write([]byte(slug))
 	}
 }
 
