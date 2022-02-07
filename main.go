@@ -64,6 +64,10 @@ func main() {
 	log.Fatal(server.ListenAndServe())
 }
 
+func ServeIndex(res http.ResponseWriter, req *http.Request) {
+	http.ServeFile(res, req, "./pages/index.html")
+}
+
 func CreateGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		slug := utils.RandomString(10)
