@@ -42,7 +42,10 @@ func (game *Game) AddPlayer(player *Player) {
 
 func main() {
 	router := mux.NewRouter()
-	hub := Hub{}
+	hub := Hub{
+		Games: make(map[string]*Game),
+		Players: make(map[string]*Player),
+	}
 
 	router.HandleFunc("/create-game", CreateGame(&hub))
 	router.HandleFunc("/play/{slug}", JoinGame(&hub))
@@ -62,12 +65,6 @@ func main() {
 func CreateGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		slug := utils.RandomString(10)
-
-		game := &Game{
-			PieceMap: []string{"i", "l", "o", "s", "t", "j", "z"},
-			Slug:     slug,
-		}
-
 		counter := 0
 
 		hub.GamesMu.Lock()
@@ -81,6 +78,12 @@ func CreateGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
 
 			game.Slug = utils.RandomString(10)
 			counter++
+		}
+
+		game := &Game{
+			PieceMap: []string{"i", "l", "o", "s", "t", "j", "z"},
+			Players: make([]*Player, 0),
+			Slug:     slug,
 		}
 
 		hub.Games[slug] = game
