@@ -127,8 +127,8 @@ func HookGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		hub.Mu.Lock()
-		defer hub.Mu.Unlock()
+		hub.GamesMu.Lock()
+		defer hub.GamesMu.Unlock()
 
 		game := hub.Games[slug]
 		if game == nil {
