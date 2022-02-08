@@ -50,6 +50,12 @@ func main() {
 	rand.Seed(time.Now().UnixMicro())
 
 	router.HandleFunc("/", ServeIndex)
+	router.PathPrefix("/static/").
+		Handler(
+			http.StripPrefix("/static/", 
+				http.FileServer(http.Dir("./static")),
+			),
+		)
 	router.HandleFunc("/create", CreateGame(&hub))
 	router.HandleFunc("/play/{slug}", JoinGame(&hub))
 	router.HandleFunc("/api/games/{slug}", HookGame(&hub))
