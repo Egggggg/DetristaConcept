@@ -47,7 +47,8 @@ func main() {
 		Players: make(map[string]*Player),
 	}
 
-	router.Handle("/static", http.FileServer(http.Dir("./static")))
+	rand.Seed(time.Now().UnixMicro())
+
 	router.HandleFunc("/", ServeIndex)
 	router.HandleFunc("/create", CreateGame(&hub))
 	router.HandleFunc("/play/{slug}", JoinGame(&hub))
