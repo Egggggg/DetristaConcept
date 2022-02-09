@@ -50,16 +50,17 @@ func main() {
 
 	rand.Seed(time.Now().UnixMicro())
 
-	router.HandleFunc("*", ServeIndex)
+	router.HandleFunc("/", ServeIndex)
 	router.PathPrefix("/static/").
 		Handler(
 			http.StripPrefix("/static/", 
-				http.FileServer(http.Dir("./static/detrista/build/static")),
+				http.FileServer(http.Dir("./static")),
 			),
 		)
 	router.HandleFunc("/create", CreateGame(&hub))
+	router.HandleFunc("/play/{slug}", JoinGame(&hub))
 	router.HandleFunc("/api/games/{slug}", HookGame(&hub))
-
+	
 	server := &http.Server{
 		Handler:      router,
 		Addr:         "0.0.0.0:8080",
@@ -72,7 +73,7 @@ func main() {
 }
 
 func ServeIndex(res http.ResponseWriter, req *http.Request) {
-	http.ServeFile(res, req, "./static/detrista/build/index.html")
+	http.ServeFile(res, req, "./pages/index.html")
 }
 
 func CreateGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
@@ -101,7 +102,28 @@ func CreateGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
 
 		hub.Games[slug] = game
 
-		http.Redirect(res, req, "/play/"+slug, http.StatusTemporaryRedirect)
+		res.WriteHeader(http.StatusAccepted)
+		res.Write([]byte(slug))
+	}
+}
+
+func JoinGame(hub *Hub) func(res http.ResponseWriter, req *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		slug := mux.Vars(req)["slug"]
+		if slug == "" {
+			http.Error(res, "page not found", http.StatusNotFound)
+			return
+		}
+
+		hub.GamesMu.Lock()
+		defer hub.GamesMu.Unlock()
+
+		if game := hub.Games[slug]; game == nil {
+			http.Error(res, "page not found", http.StatusNotFound)
+			return
+		}
+
+		http.ServeFile(res, req, "./pages/game.html")
 	}
 }
 
